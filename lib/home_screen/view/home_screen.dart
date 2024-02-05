@@ -8,42 +8,40 @@ class HomeScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: const Color(0xFFF3F3EF),
       body: GridView.builder(
-        itemCount: 5,
-        shrinkWrap: true,
-        padding: const EdgeInsets.all(16.0),
+        // itemCount: 4,
+          itemCount: homeController.homeOrganization.value["data"].length,
+          shrinkWrap: true,
+          cacheExtent: 300,
+          physics: const NeverScrollableScrollPhysics(),
+          gridDelegate:   SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: MediaQuery.sizeOf(context).width < 340? 1 : 2,
+            crossAxisSpacing: 10,
+            mainAxisSpacing: 10,
+            mainAxisExtent: 300,
 
-        gridDelegate:   const SliverGridDelegateWithMaxCrossAxisExtent(
-         childAspectRatio: 1, // Adjust this for desired item height/width ratio
-          crossAxisSpacing: 10,
-          mainAxisSpacing: 10,
-           maxCrossAxisExtent: 200,
+          ),
+          itemBuilder: (context, index) {
+            return InkWell(
+              onTap: (){
 
-        ),
-        itemBuilder: (context, index) {
-           return GestureDetector(
-             onTap: () => print('Item  tapped!'),
-             child: Container(
-               height: 700,
-               decoration: const BoxDecoration(
-                 color: Colors.white,
-                borderRadius: BorderRadius.all(Radius.circular(10))
-               ),
-                child: Column(
-                 crossAxisAlignment: CrossAxisAlignment.center,
-                 mainAxisAlignment: MainAxisAlignment.start,
-                 children: [
-                   Image.asset("assets/images/product_image.png"),
-                   const Text("ACI Pure Salt 1kg", style: TextStyle(fontSize: 16.0)),
-                   const Text("ACI Pure Salt 1kg", style: TextStyle(fontSize: 16.0)),
-                   const Text("ACI Pure Salt 1kg", style: TextStyle(fontSize: 16.0)),
-                   const Text("ACI Pure Salt 1kg", style: TextStyle(fontSize: 16.0)),
-                   const Text("ACI Pure Salt 1kg", style: TextStyle(fontSize: 16.0)),
-                   const Text('price 42', style: TextStyle(fontWeight: FontWeight.bold)),
-                 ],
-               ),
-             ),
-           );
-        },
+                print("print legth---${homeController.homeOrganization.value["data"].length}");
+                print(homeController.homeOrganization.value["data"].length);
+                Get.to( RechortDescription( orgId:homeController.homeOrganization.value["data"][index]['id'] ,
+                  category: '${homeController.homeOrganization.value["data"][index]['category']['name']}'
+                  ,title:'${homeController.homeOrganization.value["data"][index]['title']}' ,image: homeController.homeOrganization.value["data"][index]['photos'].isEmpty? "assets":'${homeController.homeOrganization.value["data"][index]['photos'][0]['path']}',));
+              },
+              child: CustomContainer(
+                organizationId: homeController.homeOrganization.value["data"][index]['id'],
+                title: '${homeController.homeOrganization.value["data"][index]['title']} ${index == 0?"dhdhdhfjhfhfhfhfhfhffhfc" : ""}',
+                imageUrl: homeController.homeOrganization.value["data"][index]['photos'].isEmpty? "assets":'${homeController.homeOrganization.value["data"][index]['photos'][0]['path']}',
+                averageRating: '${homeController.homeOrganization.value["data"][index]['averageRating']}',
+                category: '${homeController.homeOrganization.value["data"][index]['category']['name']}',
+                //averageRating: '0',
+                balance: '${homeController.homeOrganization.value["data"][index]['price']}',
+              ),
+
+            );
+          }
       ),
     );
   }
