@@ -1,54 +1,184 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+
+import '../../cart_screen/cart_controller.dart';
+import '../controller/home_controller.dart';
 
 class HomeScreen extends StatelessWidget {
-  const HomeScreen({super.key});
+  HomeScreen({super.key});
+
+  final homeController = Get.put(HomeController());
+  final cartController = Get.put(CartController());
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFFF3F3EF),
-      body: GridView.builder(
-        itemCount: 5,
-        shrinkWrap: true,
-        padding: const EdgeInsets.all(16.0),
-
-        gridDelegate:   const SliverGridDelegateWithMaxCrossAxisExtent(
-         childAspectRatio: 1, // Adjust this for desired item height/width ratio
-          crossAxisSpacing: 10,
-          mainAxisSpacing: 10,
-           maxCrossAxisExtent: 200,
-
-        ),
-        itemBuilder: (context, index) {
-           return GestureDetector(
-             onTap: () => print('Item  tapped!'),
-             child: Container(
-               height: 700,
-               decoration: const BoxDecoration(
-                 color: Colors.white,
-                borderRadius: BorderRadius.all(Radius.circular(10))
-               ),
-                child: Column(
-                 crossAxisAlignment: CrossAxisAlignment.center,
-                 mainAxisAlignment: MainAxisAlignment.start,
-                 children: [
-                   Image.asset("assets/images/product_image.png"),
-                   const Text("ACI Pure Salt 1kg", style: TextStyle(fontSize: 16.0)),
-                   const Text("ACI Pure Salt 1kg", style: TextStyle(fontSize: 16.0)),
-                   const Text("ACI Pure Salt 1kg", style: TextStyle(fontSize: 16.0)),
-                   const Text("ACI Pure Salt 1kg", style: TextStyle(fontSize: 16.0)),
-                   const Text("ACI Pure Salt 1kg", style: TextStyle(fontSize: 16.0)),
-                   const Text('price 42', style: TextStyle(fontWeight: FontWeight.bold)),
-                 ],
-               ),
-             ),
-           );
-        },
+    return SafeArea(
+      child: Scaffold(
+        backgroundColor: const Color(0xFFF3F3EF),
+        body: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 10),
+            child: Obx(() => switch (homeController.responseStatus.value) {
+                  Status.Loading => const Center(
+                    child: CircularProgressIndicator(
+                        color: Colors.grey,
+                      ),
+                  ),
+                  Status.Completed => GridView.builder(
+                       gridDelegate:
+                          const SliverGridDelegateWithMaxCrossAxisExtent(
+                        crossAxisSpacing: 8.0,
+                        mainAxisExtent: 300,
+                        mainAxisSpacing: 8.0,
+                        maxCrossAxisExtent: 212,
+                      ),
+                      itemCount: homeController.product.length,
+                      // Replace this with the actual number of items you have
+                      itemBuilder: (context, index) {
+                        return Container(
+                          decoration: const BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.all(Radius.circular(10)),
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                                Align(
+                                alignment: Alignment.centerLeft,
+                                child: InkWell(
+                                  onTap: () {
+                                    cartController.addToCart(product: homeController.product[index]);
+                                  },
+                                  child: const Padding(
+                                    padding: EdgeInsets.only(top: 8.0, left: 8),
+                                    child: CircleAvatar(
+                                      radius: 15,
+                                      backgroundColor: Color(0xff0DB04B),
+                                      child: Icon(Icons.add, color: Colors.white,),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              Stack(
+                                clipBehavior: Clip.none,
+                                children: [
+                                  Image.asset(
+                                    "assets/images/product_image.png",
+                                    height: 130,
+                                    width: 106,
+                                  ),
+                                  Positioned(top: -10, right: -40, child: Transform.rotate(
+                                    angle: 40 * (3.141592653589793238462 / 180), // Convert degrees to radians
+                                    child: Container(
+                                      height: 60,
+                                      width: 120,
+                                      decoration: const BoxDecoration(
+                                        image: DecorationImage(
+                                          image: AssetImage("assets/images/discount_background.png")
+                                        )
+                                      ),
+                                      child: const Center(
+                                        child: Text(
+                                          '20% OFF',
+                                          style: TextStyle(fontSize: 14.0, fontWeight: FontWeight.bold, color: Color(0xff744210)),
+                                        ),
+                                      ),
+                                    ),
+                                  ),)
+                                ],
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.only(right: 8.0),
+                                child: Align(
+                                  alignment: Alignment.centerRight,
+                                  child: Container(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 5, vertical: 3),
+                                    color:  homeController.product[index]['isPlastic']!=null? (homeController.product[index]['isPlastic']? const Color(0xffEDF2F7) : const Color(0xffB2F5EA)) : const Color(0xffB2F5EA),
+                                    child:   Text(
+                                      homeController.product[index]['isPlastic']!=null? (homeController.product[index]['isPlastic']? "WITH PLASTIC" : "PLASTIC FREE") : "PLASTIC FREE",
+                                      style: const TextStyle(
+                                          color: Color(0xff234E52),
+                                          fontSize: 13,
+                                          fontWeight: FontWeight.w800),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              SizedBox(
+                                child: Padding(
+                                  padding: const EdgeInsets.only(
+                                      left: 5, right: 15.0),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      const Text(
+                                        "IN STOCK",
+                                        style: TextStyle(
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.w800,
+                                            color: Color(0xff0DB04B)),
+                                      ),
+                                      Text(
+                                          homeController.product[index]['name']??"",
+                                          maxLines: 2,
+                                          overflow: TextOverflow.ellipsis,
+                                          style: const TextStyle(
+                                              fontSize: 14.0,
+                                              fontWeight: FontWeight.w800,
+                                              color: Color(0xff1D1D21))),
+                                      const Text("1 Kg",
+                                          style: TextStyle(
+                                              fontSize: 12.0,
+                                              color: Color(0xff828282))),
+                                      Row(
+                                        children: [
+                                          Text.rich(TextSpan(
+                                              text: "\u09F3",
+                                              style: const TextStyle(
+                                                  fontWeight: FontWeight.bold,
+                                                  fontSize: 18),
+                                              children: [
+                                                TextSpan(
+                                                  text:
+                                                      " ${homeController.product[index]['price']??""}",
+                                                  style: const TextStyle(
+                                                      color: Color(0xff1D1D21),
+                                                      fontSize: 14,
+                                                      fontWeight:
+                                                          FontWeight.bold),
+                                                )
+                                              ])),
+                                          const SizedBox(
+                                            width: 5,
+                                          ),
+                                          Text(
+                                            "\u09F3 ${homeController.product[index]['price']??""}",
+                                            style: const TextStyle(
+                                                color:  Color(0xff0DB04B),
+                                                fontSize: 13,
+                                                decoration:
+                                                    TextDecoration.lineThrough,
+                                            decorationColor: Colors.red
+                                            ),
+                                          )
+                                        ],
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              )
+                            ],
+                          ),
+                        );
+                      }),
+                  Status.Error => const Center(
+                      child: Text("Something went wrong..."),
+                    ),
+                  (_) => const SizedBox.shrink(),
+                })),
       ),
     );
   }
 }
-// BottomNavigationBarItem(icon: Image.asset("assets/nav_image/home.png"), label: ""),
-// BottomNavigationBarItem(icon: Image.asset("assets/nav_image/category.png"), label: ""),
-// BottomNavigationBarItem(icon: Image.asset("assets/nav_image/search.png"), label: ""),
-// BottomNavigationBarItem(icon: Image.asset("assets/nav_image/menu.png"), label: ""),
