@@ -1,6 +1,8 @@
 import 'package:get/get.dart';
 import 'package:practice_project/config/api_routes.dart';
 
+import '../../cart_screen/cart_controller.dart';
+import '../../data/local_db/db_helper.dart';
 import '../../data/network/network_api_services.dart';
 
 
@@ -9,6 +11,8 @@ enum Status { Loading, Completed, Error }
 
 class HomeController extends GetxController{
   final _api = NetworkApiServices();
+  final cartController = Get.put(CartController());
+  final dbHelper = DbHelper();
    RxList<dynamic> product = [].obs;
    Rx<Status> responseStatus = Rx(Status.Loading);
 
@@ -70,10 +74,15 @@ class HomeController extends GetxController{
   Future<void> fetchProductFromApi() async {
      responseStatus.value = Status.Loading;
      product.clear();
-     _api.getApi(url: ApiRoutes.homeUrl).then((value) {
+     _api.getApi(url: ApiRoutes.homeUrl).then((value) async {
        if(value != null){
           product.addAll(value);
-         responseStatus.value = Status.Completed;
+
+         final localCartData = await dbHelper.getAllItemsFromLocalDb();
+           if(localCartData.isNotEmpty){
+             cartController.cartProductList.addAll(localCartData);
+           }
+           responseStatus.value = Status.Completed;
        }
        else{
          responseStatus.value = Status.Error;
