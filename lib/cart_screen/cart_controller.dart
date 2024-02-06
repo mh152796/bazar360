@@ -1,13 +1,16 @@
 import 'package:get/get.dart';
 
+import '../data/local_db/db_helper.dart';
 import '../utils/utils.dart';
 
 class CartController extends GetxController {
-  RxList<dynamic> cartProductList = RxList([]);
+  RxList<Map<String, dynamic>> cartProductList = RxList([]);
+  final dbHelper = DbHelper();
   RxDouble totalPrice = 0.0.obs;
 
   void addToCart({required dynamic product}) {
     if (productInCart(product: product) != true) {
+      dbHelper.insertDataToDb(product);
       product['qty'] = 1;
       cartProductList.add(product);
       calculateTotalPrice();
@@ -22,17 +25,22 @@ class CartController extends GetxController {
         .indexWhere((element) => element['_id'] == product['_id']);
     int newQuantity;
     if (index != -1) {
+      // print(" cartProductList[index] cartProductList[index] ${ cartProductList[index].runtimeType.toString()}");
       if (isAdd) {
         newQuantity = cartProductList[index]['qty'] + 1;
+        cartProductList[index]['qty'] = newQuantity;
+        dbHelper.update(cartProductList[index]);
       } else {
         if (cartProductList[index]['qty'] > 1) {
           newQuantity = cartProductList[index]['qty'] - 1;
+          cartProductList[index]['qty'] = newQuantity;
+          dbHelper.update(cartProductList[index]);
         } else {
           newQuantity = cartProductList[index]['qty'];
         }
       }
-      cartProductList[index]['qty'] = newQuantity;
-      cartProductList.refresh();
+      // cartProductList[index]['qty'] = newQuantity;
+      // cartProductList.refresh();
     }
     calculateTotalPrice();
   }

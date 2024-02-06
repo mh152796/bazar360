@@ -49,17 +49,43 @@ class DbHelper {
 
   Future insertDataToDb(dynamic data) async {
      final db = await _open();
-     db.insert('product', data);
+     final insertItem = {
+       "_id": data['_id'],
+       "sku": data['sku'],
+       "name": data['name'],
+       "price": data['price'],
+       "isPlastic": data['isPlastic']?1:0,
+       "qty": data['qty'],
+     };
+     db.insert('product', insertItem);
   }
 
   Future<List<Map<String, dynamic>>> getAllItemsFromLocalDb() async {
     final db = await _open();
-    final productItemsFromLocalDb = await db.query('product', );
-    return productItemsFromLocalDb;
+    List<dynamic> productItemsFromLocalDb = await db.rawQuery("select * from product");
+    List<Map<String, dynamic>> dataList = [];
+    for(int i = 0; i < productItemsFromLocalDb.length; i++){
+      final single = productItemsFromLocalDb[i] as Map<String, dynamic>;
+      dataList.add(single);
+    }
+     return dataList as List<Map<String, dynamic>>;
   }
 
   Future deleteDataFromDb(dynamic data) async {
     final db = await _open();
      db.delete('product',  where: '_id= ${data['_id']}', whereArgs: ['id']);
+  }
+  Future<int> update(dynamic data) async {
+     final db = await _open();
+    final insertItem = {
+      "_id": data['_id'],
+      "sku": data['sku'],
+      "name": data['name'],
+      "price": data['price'],
+      "isPlastic": data['isPlastic']?1:0,
+      "qty": data['qty'],
+    };
+    return await db.update('product', insertItem,
+        where: '_id= ${data['_id']}', whereArgs: ['id']);
   }
 }

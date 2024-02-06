@@ -78,9 +78,12 @@ class HomeController extends GetxController{
        if(value != null){
           product.addAll(value);
 
-         final localCartData = await dbHelper.getAllItemsFromLocalDb();
+          List<Map<String, dynamic>> localCartData = await dbHelper.getAllItemsFromLocalDb();
+          print("localCartDatalocalCartDatalocalCartData ${localCartData.toString()}");
+          print("localCartDatalocalCartDatalocalCartData ${localCartData.length.toString()}");
            if(localCartData.isNotEmpty){
-             cartController.cartProductList.addAll(localCartData);
+              cartController.cartProductList.addAll(localCartData);
+             cartController.calculateTotalPrice();
            }
            responseStatus.value = Status.Completed;
        }
@@ -88,6 +91,7 @@ class HomeController extends GetxController{
          responseStatus.value = Status.Error;
        }
      }).onError((error, stackTrace) {
+       print("errorerror ${error.toString()}");
        responseStatus.value = Status.Error;
      });
     }
