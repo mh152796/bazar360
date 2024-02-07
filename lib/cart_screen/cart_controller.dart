@@ -25,15 +25,18 @@ class CartController extends GetxController {
         .indexWhere((element) => element['_id'] == product['_id']);
     int newQuantity;
     if (index != -1) {
-      // print(" cartProductList[index] cartProductList[index] ${ cartProductList[index].runtimeType.toString()}");
-      if (isAdd) {
+       if (isAdd) {
         newQuantity = cartProductList[index]['qty'] + 1;
         cartProductList[index]['qty'] = newQuantity;
-        dbHelper.update(cartProductList[index]);
+        cartProductList.refresh();
+        dbHelper.update(cartProductList[index]).then((value) {
+          print("fkvjfgn  difiididi ${value}");
+        });
       } else {
         if (cartProductList[index]['qty'] > 1) {
           newQuantity = cartProductList[index]['qty'] - 1;
           cartProductList[index]['qty'] = newQuantity;
+          cartProductList.refresh();
           dbHelper.update(cartProductList[index]);
         } else {
           newQuantity = cartProductList[index]['qty'];
@@ -49,6 +52,7 @@ class CartController extends GetxController {
     int index = cartProductList
         .indexWhere((element) => element['_id'] == product['_id']);
     if (index != -1) {
+      dbHelper.deleteDataFromDb(cartProductList[index]);
       cartProductList.removeAt(index);
       calculateTotalPrice();
     }
@@ -65,5 +69,13 @@ class CartController extends GetxController {
     return cartProductList
         .where((element) => element['_id'] == product['_id'])
         .isNotEmpty;
+  }
+
+  void checkout(){
+    cartProductList.clear();
+    totalPrice.value = 0.0;
+    dbHelper.deleteAllItem().then((value) {
+      print("valuevvvaluevalue ${value.toString()}");
+    });
   }
 }

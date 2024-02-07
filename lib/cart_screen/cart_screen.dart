@@ -13,6 +13,18 @@ class CartScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
+        appBar: AppBar(
+          title: const Text("Cart"),
+          centerTitle: true,
+          actions:   [
+            Badge(
+              label: Obx(() => Text(cartController.cartProductList.value.length.toString())),
+              child: const Icon(Icons.shopping_cart),
+            ),
+            
+            const SizedBox(width: 15,)
+          ],
+        ),
         backgroundColor: const Color(0xffF3F3EF),
         bottomSheet: SizedBox(
           height: 100,
@@ -44,7 +56,9 @@ class CartScreen extends StatelessWidget {
                           fixedSize:
                           Size(MediaQuery.sizeOf(context).width - 20, 30),
                           backgroundColor: const Color(0xff0DB04B)),
-                      onPressed: () {},
+                      onPressed: () {
+                        cartController.checkout();
+                      },
                       child: const Text(
                         "Checkout",
                         style: TextStyle(
@@ -59,18 +73,10 @@ class CartScreen extends StatelessWidget {
         ),
         body: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 8.0),
-          child: Obx(() => SingleChildScrollView(
-                child: cartController.cartProductList.isNotEmpty
-                    ? Column(
+          child: Obx(() => cartController.cartProductList.isNotEmpty? SingleChildScrollView(
+                child:  Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(
-                            "Shopping Cart (${cartController.cartProductList.length})",
-                            style: const TextStyle(
-                                fontSize: 20,
-                                fontWeight: FontWeight.w900,
-                                color: Color(0xff001E00)),
-                          ),
                           const SizedBox(height: 20,),
                           Text(
                             "Added items (${cartController.cartProductList.length} Items)",
@@ -79,6 +85,7 @@ class CartScreen extends StatelessWidget {
                                 fontWeight: FontWeight.w900,
                                 color: Color(0xff001E00)),
                           ),
+                          const SizedBox(height: 15,),
                           ListView.builder(
                             itemCount:
                                 cartController.cartProductList.length,
@@ -156,9 +163,8 @@ class CartScreen extends StatelessWidget {
                             ),
                           )
                         ],
-                      )
-                    : const Center(child: Text("No Cart Item")),
-              )),
+                      ),
+              ) : const Center(child: Text("No Cart Item"))),
         ),
       ),
     );

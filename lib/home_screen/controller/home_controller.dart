@@ -91,8 +91,7 @@ class HomeController extends GetxController{
          responseStatus.value = Status.Error;
        }
      }).onError((error, stackTrace) {
-       print("errorerror ${error.toString()}");
-       responseStatus.value = Status.Error;
+        responseStatus.value = Status.Error;
      });
     }
 }
