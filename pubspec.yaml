@@ -38,6 +38,8 @@ dependencies:
   get: ^4.6.6
   http: ^1.2.0
   sqflite: ^2.3.2
+  carousel_slider: ^4.2.1
+  dots_indicator: ^3.0.0
 
 dev_dependencies:
   flutter_test:
